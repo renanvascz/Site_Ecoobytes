@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EcooBytes — Inclusão Digital</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #090d1a;
+      --bg-nav:    #0b0f1e;
+      --green:     #35d46a;
+      --green-lt:  #7dffad;
+      --green-dk:  #1fa34a;
+      --white:     #ffffff;
+      --muted:     #b0bac8;
+      --border:    rgba(53,212,106,0.30);
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    header {
+      background: var(--bg-nav);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 9999;
+}
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 40px;
+      height: 72px;
+    }
+
+    /* green line under nav */
+    .nav-line {
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent, var(--green), transparent);
+      opacity: 0.55;
+    }
+
+    /* logo */
+    .logo-box { display: flex; align-items: center; }
+    .logo-box a { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo-img { width: 55px; height: 55px; object-fit: contain; }
+    .logo-text { display: flex; flex-direction: column; justify-content: center; line-height: 1; margin-top: 2px; }
+    .logo-name { font-size: 26px; font-weight: 700; letter-spacing: 1px; white-space: nowrap; text-shadow: 0 0 15px rgba(53,212,106,0.18); }
+    .logo-name .ecoo {
+      background: linear-gradient(135deg, #7dffad 0%, #35d46a 45%, #1fa34a 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .logo-name .byte { color: #ffffff; }
+    .logo-coop {
+      background: linear-gradient(135deg, #7dffad 0%, #35d46a 45%, #1fa34a 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      font-size: 12px; font-weight: 500; letter-spacing: 2px; margin-top: 2px;
+      width: 100%; text-align: center;
+    }
+
+    /* nav links (center) — flex child, sem position absolute no desktop */
+    .nav-links {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      gap: 36px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--white);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 500;
+      opacity: 0.88;
+      transition: opacity .2s, color .2s;
+    }
+    .nav-links a:hover { opacity: 1; color: var(--green); }
+
+    .nav-actions { display: flex; align-items: center; gap: 14px; }
+
+    /* CTA button */
+    .btn-nav {
+      background: var(--green);
+      color: #0a0e1a;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 11px 28px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: filter .2s, transform .15s;
+      white-space: nowrap;
+    }
+    .btn-nav:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+    /* hamburger toggle (mobile only) */
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      width: 40px;
+      height: 40px;
+      background: transparent;
+      border: 1.5px solid rgba(53,212,106,0.35);
+      border-radius: 8px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .nav-toggle span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: var(--green-lt);
+      border-radius: 2px;
+      transition: transform .25s ease, opacity .2s ease;
+    }
+    .nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+    .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── NATURE DECOR (leaves / plants) ── */
+    .leaf-deco {
+      position: absolute;
+      z-index: 0;           /* 0 = visível sobre o fundo, abaixo do conteúdo */
+      pointer-events: none;
+      user-select: none;
+    }
+    .leaf-deco svg { display: block; width: 100%; height: 100%; }
+
+    /* Garante que o conteúdo fique acima das folhas decorativas */
+    .hero > *:not(.leaf-deco),
+    .simulator-section > *:not(.leaf-deco),
+    .sobre-section > *:not(.leaf-deco),
+    .funciona-section > *:not(.leaf-deco),
+    .impacto-section > *:not(.leaf-deco),
+    .servicos-section > *:not(.leaf-deco),
+    .footer-wrapper > footer,
+    .footer-wrapper > .footer-bottom {
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 700px) {
+      .leaf-deco.hide-mobile { display: none; }
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 80px 40px 60px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 40px;
+      min-height: calc(100vh - 74px);
+    }
+
+    .hero-left { display: flex; flex-direction: column; gap: 0; }
+
+    .hero-title {
+      font-size: clamp(42px, 5vw, 64px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      margin-bottom: 36px;
+    }
+    .hero-title .accent {
+      background: linear-gradient(135deg, var(--green-lt) 0%, var(--green) 50%, #00c8a0 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 17px;
+      font-weight: 400;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 520px;
+      margin-bottom: 48px;
+    }
+
+    /* social */
+    .hero-social {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .hero-social .label { font-weight: 500; }
+    .hero-social a { color: var(--green-lt); text-decoration: none; font-weight: 600; }
+    .hero-social a:hover { text-decoration: underline; }
+    .hero-social .divider { opacity: 0.4; }
+
+    /* ── ILLUSTRATION ── */
+    .hero-right {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hero-right svg {
+      width: 100%;
+      max-width: 560px;
+      height: auto;
+      filter: drop-shadow(0 30px 80px rgba(53,212,106,0.18));
+    }
+
+    /* ── IMPACT SIMULATOR ── */
+    .simulator-section {
+      position: relative;
+      padding: 100px 40px 110px;
+      text-align: center;
+    }
+
+    .simulator-section h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 20px;
+    }
+
+    .simulator-section .sub {
+      font-size: 17px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 640px;
+      margin: 0 auto 56px;
+    }
+
+    .sim-card {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #0e1428;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 44px 48px 40px;
+    }
+
+    /* slider row */
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .slider-header .label {
+      font-size: 15px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .slider-header .kg-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--green);
+    }
+
+    /* custom range input */
+    .sim-range {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 99px;
+      outline: none;
+      cursor: pointer;
+      background: linear-gradient(
+        to right,
+        var(--green) 0%,
+        var(--green) var(--pct, 5%),
+        #2a3350 var(--pct, 5%),
+        #2a3350 100%
+      );
+    }
+    .sim-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 0 4px rgba(53,212,106,0.25);
+      cursor: pointer;
+      transition: box-shadow .15s;
+    }
+    .sim-range::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 0 7px rgba(53,212,106,0.2);
+    }
+    .sim-range::-moz-range-thumb {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--green);
+      border: none;
+      box-shadow: 0 0 0 4px rgba(53,212,106,0.25);
+    }
+
+    .slider-scale {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      opacity: 0.7;
+    }
+
+    .sim-divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin: 36px 0 32px;
+    }
+
+    /* stats grid */
+    .sim-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .stat-col {
+      padding: 0 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .stat-col + .stat-col {
+      border-left: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .stat-col .stat-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+      text-transform: uppercase;
+      line-height: 1.4;
+      margin-bottom: 14px;
+    }
+
+    .stat-col .stat-num {
+      font-size: clamp(38px, 5vw, 54px);
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--green-lt) 0%, var(--green) 60%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+      transition: all .3s ease;
+    }
+
+    .stat-col .stat-desc {
+      font-size: 13px;
+      color: var(--muted);
+      opacity: 0.75;
+    }
+
+    /* CTA button */
+    .sim-cta-wrap {
+      margin-top: 36px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .btn-sim-cta {
+      background: transparent;
+      border: 2px solid var(--green);
+      color: var(--green);
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 17px 40px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s, color .2s, transform .15s;
+    }
+    .btn-sim-cta:hover {
+      background: var(--green);
+      color: #0a0e1a;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 700px) {
+      .sim-card { padding: 28px 20px 28px; }
+      .sim-stats { grid-template-columns: 1fr; gap: 28px; }
+      .stat-col + .stat-col { border-left: none; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 28px; }
+      .simulator-section { padding: 60px 20px 70px; }
+    }
+
+    /* ── QUEM SOMOS ── */
+    .sobre-section {
+      position: relative;
+      padding: 110px 40px 120px;
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 60px;
+    }
+
+    .sobre-left {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .sobre-left svg {
+      width: 100%;
+      max-width: 420px;
+      height: auto;
+      filter: drop-shadow(0 20px 60px rgba(53,212,106,0.16));
+    }
+
+    .sobre-right { display: flex; flex-direction: column; gap: 0; }
+
+    .eyebrow {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, var(--green-lt) 0%, var(--green) 60%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 22px;
+    }
+
+    .sobre-title {
+      font-size: clamp(30px, 4vw, 52px);
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.8px;
+      margin-bottom: 32px;
+    }
+
+    .sobre-body {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 18px;
+      max-width: 620px;
+    }
+
+    .sobre-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 36px;
+    }
+
+    .sobre-card {
+      border: 1.5px solid rgba(53,212,106,0.35);
+      border-radius: 14px;
+      padding: 22px 22px 20px;
+      background: rgba(53,212,106,0.03);
+      transition: border-color .2s, background .2s;
+    }
+    .sobre-card:hover {
+      border-color: rgba(53,212,106,0.65);
+      background: rgba(53,212,106,0.06);
+    }
+
+    .sobre-card .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--green-lt) 0%, var(--green) 60%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    .sobre-card .card-body {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 860px) {
+      .sobre-section { grid-template-columns: 1fr; padding: 60px 24px 70px; }
+      .sobre-cards { grid-template-columns: 1fr; }
+      .sobre-left svg { max-width: 300px; }
+    }
+
+    /* ── COMO FUNCIONA ── */
+    .funciona-section {
+      position: relative;
+      padding: 110px 40px 120px;
+      text-align: center;
+      background: linear-gradient(180deg, #090d1a 0%, #0b0f20 50%, #090d1a 100%);
+    }
+
+    .funciona-eyebrow {
+      font-size: 17px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--green-lt) 0%, var(--green) 60%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 18px;
+      letter-spacing: 0.3px;
+    }
+
+    .funciona-title {
+      font-size: clamp(32px, 5vw, 62px);
+      font-weight: 900;
+      letter-spacing: -1px;
+      line-height: 1.08;
+      margin-bottom: 20px;
+    }
+
+    .funciona-sub {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--muted);
+      max-width: 720px;
+      margin: 0 auto 64px;
+      line-height: 1.6;
+    }
+
+    .process-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    .process-card {
+      background: #0e1428;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 36px 32px 34px;
+      text-align: left;
+      transition: border-color .25s, transform .2s;
+    }
+    .process-card:hover {
+      border-color: rgba(53,212,106,0.3);
+      transform: translateY(-4px);
+    }
+
+    .process-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background: rgba(53,212,106,0.12);
+      border: 1.5px solid rgba(53,212,106,0.4);
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--green);
+      letter-spacing: 0.5px;
+      margin-bottom: 24px;
+    }
+
+    .process-card h3 {
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      margin-bottom: 18px;
+      line-height: 1.2;
+    }
+
+    .process-card .card-desc {
+      font-size: 14.5px;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .process-divider {
+      border: none;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 22px;
+    }
+
+    .process-bullets {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .process-bullets li {
+      font-size: 13.5px;
+      color: var(--muted);
+      opacity: 0.8;
+      padding-left: 16px;
+      position: relative;
+    }
+    .process-bullets li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 7px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--green);
+      opacity: 0.7;
+    }
+
+    @media (max-width: 860px) {
+      .process-grid { grid-template-columns: 1fr; max-width: 480px; }
+      .funciona-section { padding: 70px 20px 80px; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding: 104px 24px 40px; min-height: auto; }
+      .hero-right { order: -1; }
+      .hero-right svg { max-width: 340px; }
+
+      .nav-toggle { display: flex; }
+
+      .nav-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        flex: none;
+        justify-content: flex-start;
+        width: 100%;
+        flex-direction: column;
+        gap: 0;
+        background: var(--bg-nav);
+        border-bottom: 1px solid rgba(53,212,106,0.2);
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transition: max-height .35s ease, opacity .25s ease;
+        pointer-events: none;
+      }
+      .nav-links.is-open {
+        max-height: 420px;
+        opacity: 1;
+        pointer-events: auto;
+        box-shadow: 0 16px 32px rgba(0,0,0,0.35);
+      }
+      .nav-links li { width: 100%; }
+      .nav-links a {
+        display: block;
+        padding: 16px 28px;
+        font-size: 16px;
+        border-top: 1px solid rgba(255,255,255,0.06);
+      }
+      .nav-links li:first-child a { border-top: none; }
+    }
+
+    @media (max-width: 700px) {
+      .servicos-grid { grid-template-columns: 1fr; gap: 26px; }
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 20px; min-height: 68px; height: auto; }
+      .logo-img { width: 46px; height: 46px; }
+      .logo-name { font-size: 20px; }
+      .logo-coop { font-size: 10px; letter-spacing: 1.5px; }
+      .btn-nav { padding: 9px 18px; font-size: 13.5px; }
+      .nav-toggle { width: 36px; height: 36px; }
+
+      .hero { padding: 96px 20px 40px; }
+      .hero-title { letter-spacing: -0.5px; }
+      .hero-social { flex-wrap: wrap; row-gap: 6px; }
+    }
+
+    @media (max-width: 380px) {
+      .logo-name { font-size: 17px; }
+      .logo-coop { display: none; }
+      .btn-nav { padding: 8px 14px; font-size: 12.5px; }
+    }
+    /* ── NOSSO IMPACTO ── */
+    .impacto-section {
+      position: relative;
+      padding: 110px 40px 120px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .impacto-eyebrow {
+      font-size: 17px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--green-lt) 0%, var(--green) 60%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+      letter-spacing: 0.3px;
+    }
+
+    .impacto-title {
+      font-size: clamp(32px, 5.5vw, 68px);
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      line-height: 1.05;
+      margin-bottom: 22px;
+    }
+
+    .impacto-sub {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--muted);
+      max-width: 680px;
+      line-height: 1.6;
+      margin-bottom: 60px;
+    }
+
+    .impacto-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .impacto-card {
+      background: #0e1428;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 40px 36px;
+      transition: border-color .25s, transform .2s;
+    }
+    .impacto-card:hover {
+      border-color: rgba(53,212,106,0.28);
+      transform: translateY(-4px);
+    }
+
+    .impacto-pct {
+      font-size: 56px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--green-lt) 0%, var(--green) 60%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 18px;
+    }
+
+    .impacto-card h3 {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      letter-spacing: -0.2px;
+    }
+
+    .impacto-card p {
+      font-size: 14.5px;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    @media (max-width: 760px) {
+      .impacto-grid { grid-template-columns: 1fr; }
+      .impacto-section { padding: 70px 20px 80px; }
+      .impacto-title { letter-spacing: -0.5px; }
+    }
+
+    /* ── SERVIÇOS TÉCNICOS ── */
+    .servicos-section {
+      position: relative;
+      padding: 110px 40px 120px;
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 60px;
+    }
+
+    .servicos-left { display: flex; flex-direction: column; }
+
+    .servicos-eyebrow {
+      font-size: 17px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--green-lt) 0%, var(--green) 60%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+    }
+
+    .servicos-title {
+      font-size: clamp(30px, 4vw, 54px);
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.8px;
+      margin-bottom: 24px;
+    }
+
+    .servicos-desc {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 580px;
+      margin-bottom: 40px;
+    }
+
+    .servicos-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px 40px;
+      margin-bottom: 48px;
+    }
+
+    .servico-item h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .servico-item p {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .btn-servicos {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: transparent;
+      border: 1.5px solid var(--green);
+      color: var(--green);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 18px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: background .2s, color .2s, transform .15s;
+      width: fit-content;
+    }
+    .btn-servicos:hover {
+      background: var(--green);
+      color: #0a0e1a;
+      transform: translateY(-2px);
+    }
+    .btn-servicos .arrow {
+      font-size: 18px;
+      transition: transform .2s;
+    }
+    .btn-servicos:hover .arrow { transform: translateX(4px); }
+
+    .servicos-right {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .servicos-right svg {
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      filter: drop-shadow(0 24px 60px rgba(53,212,106,0.18));
+    }
+
+    /* ── FOOTER ── */
+    .footer-wrapper {
+      position: relative;
+      overflow: hidden;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      background: #0b0f1e;
+    }
+
+    footer {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 64px 40px 40px;
+      display: grid;
+      grid-template-columns: 1.8fr 1fr 1fr;
+      gap: 60px;
+    }
+
+    .footer-brand .footer-desc {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 340px;
+      margin-top: 20px;
+      opacity: 0.8;
+    }
+
+    .footer-col h5 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, var(--green-lt) 0%, var(--green) 60%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 22px;
+    }
+
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .footer-col ul li a {
+      font-size: 14px;
+      color: var(--muted);
+      text-decoration: none;
+      opacity: 0.8;
+      transition: color .2s, opacity .2s;
+    }
+    .footer-col ul li a:hover { color: var(--white); opacity: 1; }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      text-align: center;
+      padding: 22px 40px;
+      font-size: 13px;
+      color: var(--muted);
+      opacity: 0.6;
+    }
+
+    @media (max-width: 900px) {
+      .servicos-section { grid-template-columns: 1fr; padding: 70px 20px 80px; }
+      .servicos-right { order: -1; }
+      .servicos-right svg { max-width: 300px; }
+      footer { grid-template-columns: 1fr; gap: 36px; padding: 48px 24px 32px; }
+      .footer-bottom { padding: 20px 24px; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav>
+      <!-- LOGO -->
+      <div class="logo-box">
+        <a href="index.html">
+          <img src="imagem/logo-pi.png" alt="Logo Ecoobytes" class="logo-img">
+          <div class="logo-text">
+            <div class="logo-name">
+              <span class="ecoo">ECOO</span><span class="byte">BYTES</span>
+            </div>
+            <span class="logo-coop">COOPERATIVA</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- NAV LINKS -->
+      <ul class="nav-links" id="navLinksList">
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="#sobre-nos">Sobre Nós</a></li>
+        <li><a href="#como-funciona">Como Funciona</a></li>
+        <li><a href="#nosso-impacto">Nosso Impacto</a></li>
+        <li><a href="#servicos">Serviços Técnicos</a></li>
+      </ul>
+
+      <!-- CTA + MOBILE TOGGLE -->
+      <div class="nav-actions">
+        <a href="doacao.php" class="btn-nav">Doar Agora</a>
+        <button type="button" class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="navLinksList">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+    <div class="nav-line"></div>
+  </header>
+
+  <script>
+    (function () {
+      const navToggle = document.getElementById('navToggle');
+      const navLinks  = document.getElementById('navLinksList');
+
+      navToggle.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('is-open');
+        navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+
+      navLinks.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+          navLinks.classList.remove('is-open');
+          navToggle.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 900) {
+          navLinks.classList.remove('is-open');
+          navToggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    })();
+  </script>
+
+  <main>
+    <section class="hero">
+
+      <!-- decor: folhas -->
+      <div class="leaf-deco" style="top:-30px; left:-50px; width:220px; height:280px; opacity:0.55; transform:rotate(-18deg);">
+        <svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
+          <path d="M60 150 C20 120 10 70 35 20 C45 5 60 5 70 20 C100 65 100 120 60 150 Z" fill="#1fa34a" opacity="0.55"/>
+          <path d="M60 148 C60 108 58 58 60 18" stroke="#7dffad" stroke-width="2" fill="none" opacity="0.4"/>
+          <path d="M60 110 L40 95 M60 88 L80 76 M60 68 L42 56 M60 50 L78 40" stroke="#7dffad" stroke-width="1.5" opacity="0.3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="leaf-deco hide-mobile" style="bottom:-40px; right:-30px; width:200px; height:240px; opacity:0.4; transform:rotate(20deg);">
+        <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+          <path d="M100 230 C98 160 100 90 105 15" stroke="#1a8a40" stroke-width="3" fill="none" opacity="0.45" stroke-linecap="round"/>
+          <ellipse cx="70" cy="210" rx="22" ry="9" fill="#35d46a" opacity="0.4" transform="rotate(-35 70 210)"/>
+          <ellipse cx="132" cy="200" rx="22" ry="9" fill="#35d46a" opacity="0.4" transform="rotate(35 132 200)"/>
+          <ellipse cx="75" cy="170" rx="20" ry="8" fill="#35d46a" opacity="0.36" transform="rotate(-32 75 170)"/>
+          <ellipse cx="128" cy="160" rx="20" ry="8" fill="#35d46a" opacity="0.36" transform="rotate(32 128 160)"/>
+          <ellipse cx="80" cy="128" rx="17" ry="7" fill="#7dffad" opacity="0.32" transform="rotate(-28 80 128)"/>
+          <ellipse cx="124" cy="120" rx="17" ry="7" fill="#7dffad" opacity="0.32" transform="rotate(28 124 120)"/>
+          <ellipse cx="86" cy="86" rx="14" ry="6" fill="#7dffad" opacity="0.28" transform="rotate(-25 86 86)"/>
+          <ellipse cx="118" cy="78" rx="14" ry="6" fill="#7dffad" opacity="0.28" transform="rotate(25 118 78)"/>
+        </svg>
+      </div>
+
+      <!-- LEFT -->
+      <div class="hero-left">
+        <h1 class="hero-title">
+          Transformando<br>
+          resíduos eletrônicos<br>
+          em <span class="accent">inclusão digital</span>
+        </h1>
+
+        <p class="hero-desc">
+          Prolongamos o ciclo de vida de equipamentos descartados para reduzir
+          o lixo eletrônico mundial e levar tecnologia acessível a comunidades
+          que mais precisam.
+        </p>
+
+
+        <div class="hero-social">
+          <span class="label">Siga-nos:</span>
+          <a href="#">@ecoobytesbr</a>
+          <span class="divider">|</span>
+          <a href="#">YouTube EcooBytes</a>
+        </div>
+      </div>
+
+      <!-- Não mexe nisso, pelo amor -->
+      <!-- RIGHT — isometric computer towers SVG -->
+      <div class="hero-right">
+        <svg viewBox="0 0 520 480" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <defs>
+            <linearGradient id="gTop" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#7dffad"/>
+              <stop offset="100%" stop-color="#35d46a"/>
+            </linearGradient>
+            <linearGradient id="gFront" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#2ebd5e"/>
+              <stop offset="100%" stop-color="#1a8a40"/>
+            </linearGradient>
+            <linearGradient id="gSide" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#1a8a40"/>
+              <stop offset="100%" stop-color="#0f5a28"/>
+            </linearGradient>
+            <linearGradient id="wTop" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#e8f7f0"/>
+              <stop offset="100%" stop-color="#c2e8d4"/>
+            </linearGradient>
+            <linearGradient id="wFront" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#d0eee0"/>
+              <stop offset="100%" stop-color="#a8d4be"/>
+            </linearGradient>
+            <linearGradient id="wSide" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#a8d4be"/>
+              <stop offset="100%" stop-color="#88beaa"/>
+            </linearGradient>
+          </defs>
+
+          <!-- ── BACK TOWER (lighter / mint) ── -->
+          <!-- top face -->
+          <polygon points="295,60 415,120 340,162 220,102" fill="url(#wTop)" opacity="0.95"/>
+          <!-- front face -->
+          <polygon points="220,102 340,162 340,370 220,310" fill="url(#wFront)"/>
+          <!-- side face -->
+          <polygon points="340,162 415,120 415,328 340,370" fill="url(#wSide)"/>
+
+          <!-- panel details – front face (light tower) -->
+          <rect x="234" y="120" width="92" height="6" rx="3" fill="#7fc4a0" opacity="0.6"/>
+          <rect x="234" y="132" width="70" height="6" rx="3" fill="#7fc4a0" opacity="0.4"/>
+          <rect x="234" y="150" width="92" height="1.5" rx="1" fill="#7fc4a0" opacity="0.3"/>
+          <!-- drive slots -->
+          <rect x="234" y="158" width="88" height="14" rx="4" fill="#8ec8ae" opacity="0.5"/>
+          <rect x="234" y="176" width="88" height="14" rx="4" fill="#8ec8ae" opacity="0.5"/>
+          <rect x="234" y="194" width="88" height="14" rx="4" fill="#8ec8ae" opacity="0.5"/>
+          <rect x="234" y="212" width="88" height="14" rx="4" fill="#8ec8ae" opacity="0.5"/>
+          <!-- mesh / ventilation grid -->
+          <rect x="234" y="234" width="88" height="56" rx="4" fill="#7cbfa0" opacity="0.25"/>
+          <line x1="246" y1="234" x2="246" y2="290" stroke="#9ed4ba" stroke-width="1" opacity="0.4"/>
+          <line x1="258" y1="234" x2="258" y2="290" stroke="#9ed4ba" stroke-width="1" opacity="0.4"/>
+          <line x1="270" y1="234" x2="270" y2="290" stroke="#9ed4ba" stroke-width="1" opacity="0.4"/>
+          <line x1="282" y1="234" x2="282" y2="290" stroke="#9ed4ba" stroke-width="1" opacity="0.4"/>
+          <line x1="294" y1="234" x2="294" y2="290" stroke="#9ed4ba" stroke-width="1" opacity="0.4"/>
+          <line x1="306" y1="234" x2="306" y2="290" stroke="#9ed4ba" stroke-width="1" opacity="0.4"/>
+          <line x1="234" y1="246" x2="322" y2="246" stroke="#9ed4ba" stroke-width="1" opacity="0.4"/>
+          <line x1="234" y1="258" x2="322" y2="258" stroke="#9ed4ba" stroke-width="1" opacity="0.4"/>
+          <line x1="234" y1="270" x2="322" y2="270" stroke="#9ed4ba" stroke-width="1" opacity="0.4"/>
+          <line x1="234" y1="282" x2="322" y2="282" stroke="#9ed4ba" stroke-width="1" opacity="0.4"/>
+
+          <!-- side panel details (light tower) -->
+          <line x1="354" y1="136" x2="406" y2="162" stroke="#88beaa" stroke-width="1.5" opacity="0.4"/>
+          <line x1="354" y1="152" x2="406" y2="178" stroke="#88beaa" stroke-width="1.5" opacity="0.4"/>
+          <line x1="354" y1="168" x2="406" y2="194" stroke="#88beaa" stroke-width="1.5" opacity="0.4"/>
+          <line x1="354" y1="200" x2="406" y2="226" stroke="#88beaa" stroke-width="1" opacity="0.3"/>
+          <line x1="354" y1="216" x2="406" y2="242" stroke="#88beaa" stroke-width="1" opacity="0.3"/>
+          <line x1="354" y1="232" x2="406" y2="258" stroke="#88beaa" stroke-width="1" opacity="0.3"/>
+          <line x1="354" y1="248" x2="406" y2="274" stroke="#88beaa" stroke-width="1" opacity="0.3"/>
+          <line x1="354" y1="264" x2="406" y2="290" stroke="#88beaa" stroke-width="1" opacity="0.3"/>
+          <line x1="354" y1="280" x2="406" y2="306" stroke="#88beaa" stroke-width="1" opacity="0.3"/>
+          <line x1="354" y1="296" x2="406" y2="322" stroke="#88beaa" stroke-width="1" opacity="0.3"/>
+
+          <!-- ── FRONT TOWER (green) ── -->
+          <!-- top face -->
+          <polygon points="105,150 260,72 340,118 185,196" fill="url(#gTop)"/>
+          <!-- front face -->
+          <polygon points="105,150 185,196 185,440 105,394" fill="url(#gFront)"/>
+          <!-- side face -->
+          <polygon points="185,196 340,118 340,362 185,440" fill="url(#gSide)"/>
+
+          <!-- front face panel details (green tower) -->
+          <circle cx="122" cy="174" r="8" fill="#7dffad" opacity="0.9"/>
+          <circle cx="122" cy="174" r="4" fill="#35d46a"/>
+          <!-- LED glow -->
+          <circle cx="122" cy="174" r="10" fill="none" stroke="#7dffad" stroke-width="1" opacity="0.4"/>
+
+          <circle cx="122" cy="200" r="6" fill="#1fa34a" opacity="0.7"/>
+          <circle cx="122" cy="200" r="3" fill="#0d6e32"/>
+
+          <!-- drive bays -->
+          <rect x="108" y="218" width="64" height="16" rx="5" fill="#1a8a40" opacity="0.7"/>
+          <rect x="108" y="238" width="64" height="16" rx="5" fill="#1a8a40" opacity="0.7"/>
+          <rect x="108" y="258" width="64" height="16" rx="5" fill="#1a8a40" opacity="0.7"/>
+          <rect x="108" y="278" width="64" height="16" rx="5" fill="#1a8a40" opacity="0.7"/>
+          <rect x="108" y="298" width="64" height="16" rx="5" fill="#1a8a40" opacity="0.55"/>
+
+          <!-- ventilation mesh front -->
+          <rect x="108" y="322" width="64" height="52" rx="4" fill="#1a8a40" opacity="0.3"/>
+          <line x1="120" y1="322" x2="120" y2="374" stroke="#35d46a" stroke-width="1" opacity="0.35"/>
+          <line x1="132" y1="322" x2="132" y2="374" stroke="#35d46a" stroke-width="1" opacity="0.35"/>
+          <line x1="144" y1="322" x2="144" y2="374" stroke="#35d46a" stroke-width="1" opacity="0.35"/>
+          <line x1="156" y1="322" x2="156" y2="374" stroke="#35d46a" stroke-width="1" opacity="0.35"/>
+          <line x1="108" y1="334" x2="172" y2="334" stroke="#35d46a" stroke-width="1" opacity="0.35"/>
+          <line x1="108" y1="346" x2="172" y2="346" stroke="#35d46a" stroke-width="1" opacity="0.35"/>
+          <line x1="108" y1="358" x2="172" y2="358" stroke="#35d46a" stroke-width="1" opacity="0.35"/>
+          <line x1="108" y1="370" x2="172" y2="370" stroke="#35d46a" stroke-width="1" opacity="0.35"/>
+
+          <!-- side panel details (green tower) -->
+          <line x1="200" y1="132" x2="324" y2="70" stroke="#35d46a" stroke-width="1.5" opacity="0.25"/>
+          <line x1="200" y1="150" x2="324" y2="88" stroke="#35d46a" stroke-width="1.5" opacity="0.25"/>
+          <line x1="200" y1="168" x2="324" y2="106" stroke="#35d46a" stroke-width="1" opacity="0.2"/>
+          <line x1="200" y1="200" x2="324" y2="138" stroke="#35d46a" stroke-width="1" opacity="0.2"/>
+          <line x1="200" y1="232" x2="324" y2="170" stroke="#35d46a" stroke-width="1" opacity="0.2"/>
+          <line x1="200" y1="264" x2="324" y2="202" stroke="#35d46a" stroke-width="1" opacity="0.2"/>
+          <line x1="200" y1="296" x2="324" y2="234" stroke="#35d46a" stroke-width="1" opacity="0.2"/>
+          <line x1="200" y1="328" x2="324" y2="266" stroke="#35d46a" stroke-width="1" opacity="0.2"/>
+
+          <!-- subtle glow ground shadow -->
+          <ellipse cx="230" cy="445" rx="190" ry="22" fill="#35d46a" opacity="0.06"/>
+        </svg>
+      </div>
+
+    </section>
+
+    <!-- ── IMPACT SIMULATOR ── -->
+    <section class="simulator-section">
+
+      <!-- decor: folhas -->
+      <div class="leaf-deco hide-mobile" style="top:10px; right:-20px; width:130px; height:115px; opacity:0.4; transform:rotate(10deg);">
+        <svg viewBox="0 0 160 140" xmlns="http://www.w3.org/2000/svg">
+          <path d="M80 130 C78 90 76 50 80 10" stroke="#35d46a" stroke-width="3" fill="none" opacity="0.45" stroke-linecap="round"/>
+          <path d="M80 95 C50 85 30 65 25 35 C55 40 75 60 80 95 Z" fill="#1a8a40" opacity="0.45"/>
+          <path d="M80 60 C110 50 130 30 135 5 C105 12 85 30 80 60 Z" fill="#35d46a" opacity="0.4"/>
+        </svg>
+      </div>
+      <h2>Simule o Impacto da sua Doação</h2>
+      <p class="sub">
+          Veja, na simulação, como o descarte responsável de equipamentos 
+          contribui para o planeta e a sociedade.
+      </p>
+
+      <div class="sim-card">
+        <!-- slider -->
+        <div class="slider-header">
+          <span class="label">Peso estimado do Descarte:</span>
+          <span class="kg-value" id="kgDisplay">15 kg</span>
+        </div>
+        <input
+          type="range"
+          class="sim-range"
+          id="weightSlider"
+          min="5" max="200" value="15" step="1"
+        />
+        <div class="slider-scale">
+          <span>5 kg (Ex: 1 Notebook)</span>
+          <span>100 kg (Ex: Vários Gabinetes)</span>
+          <span>200 kg+  (Ex: Lote de Empresa)</span>
+        </div>
+
+        <hr class="sim-divider" />
+
+        <!-- stats -->
+        <div class="sim-stats">
+          <div class="stat-col">
+            <p class="stat-title">Computadores<br>Recondicionados</p>
+            <div class="stat-num" id="statComputers">2</div>
+            <p class="stat-desc">prontos para doação ou venda social</p>
+          </div>
+          <div class="stat-col">
+            <p class="stat-title">CO² Evitado<br>de Emissão</p>
+            <div class="stat-num" id="statCo2">27 kg</div>
+            <p class="stat-desc" id="statCo2Sub">equivalente a plantar 3 árvores</p>
+          </div>
+          <div class="stat-col">
+            <p class="stat-title">Pessoas Incluídas<br>Digitalmente</p>
+            <div class="stat-num" id="statPeople">8</div>
+            <p class="stat-desc">com acesso à educação digital</p>
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="sim-cta-wrap">
+          <a href="doacao.php" class="btn-sim-cta" id="simCta">
+            Agendar Coleta de 15 kg agora →
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── QUEM SOMOS ── -->
+  <section id="sobre-nos">
+    <div class="sobre-section">
+
+      <!-- decor: folhas -->
+      <div class="leaf-deco hide-mobile" style="bottom:-50px; left:-40px; width:200px; height:240px; opacity:0.4; transform:rotate(-12deg);">
+        <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+          <path d="M100 230 C98 160 100 90 105 15" stroke="#1a8a40" stroke-width="3" fill="none" opacity="0.45" stroke-linecap="round"/>
+          <ellipse cx="70" cy="210" rx="22" ry="9" fill="#35d46a" opacity="0.4" transform="rotate(-35 70 210)"/>
+          <ellipse cx="132" cy="200" rx="22" ry="9" fill="#35d46a" opacity="0.4" transform="rotate(35 132 200)"/>
+          <ellipse cx="75" cy="170" rx="20" ry="8" fill="#35d46a" opacity="0.36" transform="rotate(-32 75 170)"/>
+          <ellipse cx="128" cy="160" rx="20" ry="8" fill="#35d46a" opacity="0.36" transform="rotate(32 128 160)"/>
+          <ellipse cx="80" cy="128" rx="17" ry="7" fill="#7dffad" opacity="0.32" transform="rotate(-28 80 128)"/>
+          <ellipse cx="124" cy="120" rx="17" ry="7" fill="#7dffad" opacity="0.32" transform="rotate(28 124 120)"/>
+        </svg>
+      </div>
+      <div class="leaf-deco" style="top:-20px; right:-20px; width:110px; height:145px; opacity:0.4; transform:rotate(24deg);">
+        <svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
+          <path d="M60 150 C20 120 10 70 35 20 C45 5 60 5 70 20 C100 65 100 120 60 150 Z" fill="#1fa34a" opacity="0.5"/>
+          <path d="M60 148 C60 108 58 58 60 18" stroke="#7dffad" stroke-width="2" fill="none" opacity="0.35"/>
+        </svg>
+      </div>
+
+      <!-- LEFT — isometric router SVG -->
+      <div class="sobre-left">
+        <svg viewBox="0 0 420 360" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <defs>
+            <linearGradient id="rTop"   x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#7dffad"/>
+              <stop offset="100%" stop-color="#35d46a"/>
+            </linearGradient>
+            <linearGradient id="rFront" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#2ebd5e"/>
+              <stop offset="100%" stop-color="#1a8a40"/>
+            </linearGradient>
+            <linearGradient id="rSide"  x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#1a8a40"/>
+              <stop offset="100%" stop-color="#0f5a28"/>
+            </linearGradient>
+          </defs>
+
+          <!-- antennas (back-left) -->
+          <rect x="138" y="60" width="8" height="100" rx="4" fill="#1e2a4a"/>
+          <rect x="138" y="56" width="8" height="12" rx="4" fill="#35d46a" opacity="0.7"/>
+          <rect x="138" y="44" width="8" height="14" rx="4" fill="#2a3a5e"/>
+
+          <!-- antennas (back-right) -->
+          <rect x="184" y="78" width="8" height="86" rx="4" fill="#1e2a4a"/>
+          <rect x="184" y="74" width="8" height="12" rx="4" fill="#35d46a" opacity="0.5"/>
+          <rect x="184" y="62" width="8" height="14" rx="4" fill="#2a3a5e"/>
+
+          <!-- router body: top face -->
+          <polygon points="70,195 230,120 340,182 180,257" fill="url(#rTop)"/>
+
+          <!-- router body: front face -->
+          <polygon points="70,195 180,257 180,290 70,228" fill="url(#rFront)"/>
+
+          <!-- router body: right side face -->
+          <polygon points="180,257 340,182 340,215 180,290" fill="url(#rSide)"/>
+
+          <!-- top face details: ventilation lines -->
+          <line x1="102" y1="208" x2="230" y2="142" stroke="#7dffad" stroke-width="1.2" opacity="0.2"/>
+          <line x1="115" y1="215" x2="243" y2="149" stroke="#7dffad" stroke-width="1.2" opacity="0.2"/>
+          <line x1="128" y1="222" x2="256" y2="156" stroke="#7dffad" stroke-width="1.2" opacity="0.2"/>
+          <line x1="141" y1="229" x2="270" y2="163" stroke="#7dffad" stroke-width="1" opacity="0.15"/>
+          <line x1="155" y1="236" x2="283" y2="170" stroke="#7dffad" stroke-width="1" opacity="0.15"/>
+
+          <!-- top: logo circle -->
+          <ellipse cx="210" cy="188" rx="22" ry="13" fill="#1a8a40" opacity="0.6"/>
+          <ellipse cx="210" cy="188" rx="14" ry="8"  fill="#35d46a" opacity="0.5"/>
+
+          <!-- front face: LEDs row -->
+          <circle cx="100" cy="258" r="5" fill="#7dffad" opacity="0.9"/>
+          <circle cx="100" cy="258" r="3" fill="#35d46a"/>
+          <circle cx="100" cy="258" r="7" fill="none" stroke="#7dffad" stroke-width="1" opacity="0.35"/>
+
+          <circle cx="118" cy="265" r="4" fill="#1fa34a" opacity="0.7"/>
+          <circle cx="118" cy="265" r="2.5" fill="#0f5a28"/>
+
+          <circle cx="134" cy="271" r="4" fill="#1fa34a" opacity="0.7"/>
+          <circle cx="134" cy="271" r="2.5" fill="#0f5a28"/>
+
+          <!-- front: wifi symbol area -->
+          <rect x="82" y="272" width="68" height="8" rx="4" fill="#1a8a40" opacity="0.55"/>
+
+          <!-- side face: ventilation slots -->
+          <rect x="196" y="264" width="52" height="5" rx="2.5" fill="#0f5a28" opacity="0.7"/>
+          <rect x="196" y="274" width="52" height="5" rx="2.5" fill="#0f5a28" opacity="0.7"/>
+          <rect x="196" y="284" width="52" height="5" rx="2.5" fill="#0f5a28" opacity="0.7"/>
+          <rect x="255" y="246" width="52" height="5" rx="2.5" fill="#0f5a28" opacity="0.55"/>
+          <rect x="255" y="256" width="52" height="5" rx="2.5" fill="#0f5a28" opacity="0.55"/>
+          <rect x="255" y="266" width="52" height="5" rx="2.5" fill="#0f5a28" opacity="0.55"/>
+
+          <!-- glow shadow -->
+          <ellipse cx="205" cy="305" rx="130" ry="14" fill="#35d46a" opacity="0.07"/>
+        </svg>
+      </div>
+
+      <!-- RIGHT — text content -->
+      <div class="sobre-right">
+        <p class="eyebrow">//Quem Somos</p>
+
+        <h2 class="sobre-title">
+          Reduzindo desperdício,<br>
+          expandindo o acesso tecnológico.
+        </h2>
+
+        <p class="sobre-body">
+          A Cooperativa EcooBytes atua na reciclagem estratégica de resíduos eletrônicos,
+          integrando sustentabilidade ambiental, recondicionamento técnico de hardware e forte
+          impacto social.
+        </p>
+
+        <p class="sobre-body">
+          O nosso grande propósito é estender o ciclo de vida útil de computadores e peças
+          descartadas, lutando ativamente contra a acumulação de e-waste e fornecendo
+          equipamentos a comunidades carentes e escolas públicas.
+        </p>
+
+        <div class="sobre-cards">
+          <div class="sobre-card">
+            <p class="card-title">Economia Circular</p>
+            <p class="card-body">Promoção do uso consciente com o reaproveitamento máximo de insumos naturais.</p>
+          </div>
+          <div class="sobre-card">
+            <p class="card-title">Inclusão Social</p>
+            <p class="card-body">Democratização digital com a doação e capacitação técnica em comunidades vulneráveis.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── COMO FUNCIONA ── -->
+  <section id="como-funciona" class="funciona-section">
+
+    <!-- decor: folhas -->
+    <div class="leaf-deco hide-mobile" style="top:30px; left:0px; width:90px; height:78px; opacity:0.35; transform:rotate(-25deg) scaleX(-1);">
+      <svg viewBox="0 0 160 140" xmlns="http://www.w3.org/2000/svg">
+        <path d="M80 130 C78 90 76 50 80 10" stroke="#35d46a" stroke-width="3" fill="none" opacity="0.45" stroke-linecap="round"/>
+        <path d="M80 95 C50 85 30 65 25 35 C55 40 75 60 80 95 Z" fill="#1a8a40" opacity="0.4"/>
+        <path d="M80 60 C110 50 130 30 135 5 C105 12 85 30 80 60 Z" fill="#35d46a" opacity="0.36"/>
+      </svg>
+    </div>
+    <div class="leaf-deco hide-mobile" style="top:40px; right:10px; width:90px; height:78px; opacity:0.35; transform:rotate(18deg);">
+      <svg viewBox="0 0 160 140" xmlns="http://www.w3.org/2000/svg">
+        <path d="M80 130 C78 90 76 50 80 10" stroke="#35d46a" stroke-width="3" fill="none" opacity="0.45" stroke-linecap="round"/>
+        <path d="M80 95 C50 85 30 65 25 35 C55 40 75 60 80 95 Z" fill="#1a8a40" opacity="0.4"/>
+        <path d="M80 60 C110 50 130 30 135 5 C105 12 85 30 80 60 Z" fill="#35d46a" opacity="0.36"/>
+      </svg>
+    </div>
+    <p class="funciona-eyebrow">// Processo Rigoroso</p>
+    <h2 class="funciona-title">Como funciona o ciclo operacional?</h2>
+    <p class="funciona-sub">
+      Seguimos uma metodologia detalhada e transparente para garantir que cada peça tenha a melhor destinação possível.
+    </p>
+
+    <div class="process-grid">
+
+      <!-- CARD 01 -->
+      <div class="process-card">
+        <div class="process-num">01</div>
+        <h3>Origem dos materiais</h3>
+        <p class="card-desc">
+          Recebemos resíduos eletrônicos de parceiros estratégicos: doações de
+          grandes empresas de TI, campanhas na comunidade e recolhas
+          programadas de e-waste.
+        </p>
+        <hr class="process-divider"/>
+        <ul class="process-bullets">
+          <li>Doação corporativa segura</li>
+          <li>Pontos de recolha distribuídos</li>
+        </ul>
+      </div>
+
+      <!-- CARD 02 -->
+      <div class="process-card">
+        <div class="process-num">02</div>
+        <h3>Triagem Técnica Crítica</h3>
+        <p class="card-desc">
+          Nossos técnicos analisam minuciosamente o hardware recebido.
+          Componentes irrecuperáveis são descartados de forma
+          ambientalmente responsável com parceiros certificados.
+        </p>
+        <hr class="process-divider"/>
+        <ul class="process-bullets">
+          <li>Testes funcionais rígidos</li>
+          <li>Descarte verde homologado</li>
+        </ul>
+      </div>
+
+      <!-- CARD 03 -->
+      <div class="process-card">
+        <div class="process-num">03</div>
+        <h3>Recondicionamento</h3>
+        <p class="card-desc">
+          Com as partes aprovadas nos testes de desempenho, montamos
+          computadores recondicionados, prontos para uso educacional,
+          comercialização sustentável ou inclusão de famílias.
+        </p>
+        <hr class="process-divider"/>
+        <ul class="process-bullets">
+          <li>Sistemas operativos instalados</li>
+          <li>Selo de qualidade EcooBytes</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── NOSSO IMPACTO ── -->
+  <section id="nosso-impacto">
+    <div class="impacto-section">
+
+      <!-- decor: folhas -->
+      <div class="leaf-deco hide-mobile" style="bottom:-30px; right:-40px; width:190px; height:250px; opacity:0.38; transform:rotate(16deg);">
+        <svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
+          <path d="M60 150 C20 120 10 70 35 20 C45 5 60 5 70 20 C100 65 100 120 60 150 Z" fill="#1fa34a" opacity="0.5"/>
+          <path d="M60 148 C60 108 58 58 60 18" stroke="#7dffad" stroke-width="2" fill="none" opacity="0.35"/>
+          <path d="M60 110 L40 95 M60 88 L80 76 M60 68 L42 56 M60 50 L78 40" stroke="#7dffad" stroke-width="1.5" opacity="0.28" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="impacto-eyebrow">// Impacto Sustentável</p>
+      <h2 class="impacto-title">Destinação Inteligente<br>de Equipamentos</h2>
+      <p class="impacto-sub">
+        Mantemos um modelo financeiramente saudável baseado na destinação equilibrada de todo o
+        material recuperado.
+      </p>
+
+      <div class="impacto-grid">
+
+        <div class="impacto-card">
+          <div class="impacto-pct">60%</div>
+          <h3>Doação Social Direta</h3>
+          <p>
+            Mais da metade dos equipamentos recondicionados é doada a escolas públicas,
+            comunidades carentes e famílias em situação de vulnerabilidade digital,
+            ampliando o acesso à educação e ao mercado de trabalho.
+          </p>
+        </div>
+
+        <div class="impacto-card">
+          <div class="impacto-pct">20%</div>
+          <h3>Venda Social a Preço Acessível</h3>
+          <p>
+            Computadores recondicionados são comercializados a preços bem abaixo do mercado,
+            garantindo que famílias de baixa renda possam adquirir tecnologia de qualidade
+            com responsabilidade financeira.
+          </p>
+        </div>
+
+        <div class="impacto-card">
+          <div class="impacto-pct">15%</div>
+          <h3>Peças para Manutenção Comunitária</h3>
+          <p>
+            Componentes em bom estado são destinados a oficinas comunitárias e programas de
+            capacitação técnica, gerando renda local e fortalecendo o ecossistema de
+            reparação e manutenção.
+          </p>
+        </div>
+
+        <div class="impacto-card">
+          <div class="impacto-pct">5%</div>
+          <h3>Reciclagem Certificada</h3>
+          <p>
+            Os componentes irrecuperáveis são encaminhados exclusivamente a parceiros de
+            reciclagem certificados, garantindo o descarte ambientalmente responsável e
+            evitando que materiais tóxicos contaminem o meio ambiente.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const slider   = document.getElementById('weightSlider');
+    const kgDisp   = document.getElementById('kgDisplay');
+    const statComp = document.getElementById('statComputers');
+    const statCo2  = document.getElementById('statCo2');
+    const statCo2S = document.getElementById('statCo2Sub');
+    const statPpl  = document.getElementById('statPeople');
+    const simCta   = document.getElementById('simCta');
+
+    function updateSliderFill(val) {
+      const pct = ((val - 5) / (200 - 5)) * 100;
+      slider.style.setProperty('--pct', pct + '%');
+    }
+
+    function animateTo(el, target, suffix = '') {
+      const current = parseInt(el.dataset.val || '0');
+      const diff = target - current;
+      const steps = 20;
+      let step = 0;
+      const timer = setInterval(() => {
+        step++;
+        const val = Math.round(current + (diff * step / steps));
+        el.textContent = val + suffix;
+        if (step >= steps) {
+          el.textContent = target + suffix;
+          el.dataset.val = target;
+          clearInterval(timer);
+        }
+      }, 16);
+    }
+
+    function calc(kg) {
+      const computers = Math.max(1, Math.floor(kg / 7.5));
+      const co2       = Math.round(kg * 1.8);
+      const trees     = Math.max(1, Math.floor(co2 / 9));
+      const people    = Math.max(1, Math.floor(kg / 1.9));
+      return { computers, co2, trees, people };
+    }
+
+    function update() {
+      const kg = parseInt(slider.value);
+      updateSliderFill(kg);
+      kgDisp.textContent = kg + ' kg';
+      simCta.textContent = `Agendar Coleta de ${kg} kg agora →`;
+
+      const r = calc(kg);
+      animateTo(statComp, r.computers, '');
+      animateTo(statCo2,  r.co2, ' kg');
+      statCo2S.textContent = `equivalente a plantar ${r.trees} árvore${r.trees !== 1 ? 's' : ''}`;
+      animateTo(statPpl,  r.people, '');
+    }
+
+    // init
+    updateSliderFill(parseInt(slider.value));
+    slider.addEventListener('input', update);
+  </script>
+
+  <!-- ── SERVIÇOS TÉCNICOS ── -->
+  <section id="servicos">
+    <div class="servicos-section">
+
+      <!-- decor: folhas -->
+      <div class="leaf-deco hide-mobile" style="top:-20px; left:-30px; width:130px; height:115px; opacity:0.4; transform:rotate(-15deg) scaleX(-1);">
+        <svg viewBox="0 0 160 140" xmlns="http://www.w3.org/2000/svg">
+          <path d="M80 130 C78 90 76 50 80 10" stroke="#35d46a" stroke-width="3" fill="none" opacity="0.45" stroke-linecap="round"/>
+          <path d="M80 95 C50 85 30 65 25 35 C55 40 75 60 80 95 Z" fill="#1a8a40" opacity="0.45"/>
+          <path d="M80 60 C110 50 130 30 135 5 C105 12 85 30 80 60 Z" fill="#35d46a" opacity="0.4"/>
+        </svg>
+      </div>
+
+      <!-- LEFT -->
+      <div class="servicos-left">
+        <p class="servicos-eyebrow">// Serviços com Compromisso</p>
+
+        <h2 class="servicos-title">
+          Suporte e Assistência<br>em Informática
+        </h2>
+
+        <p class="servicos-desc">
+          Complementando a nossa atividade de reciclagem técnica, fornecemos assistência técnica
+          profissional de computadores para empresas e cidadãos. Isto capacita os nossos
+          cooperados e gera renda sustentável.
+        </p>
+
+        <div class="servicos-grid">
+          <div class="servico-item">
+            <h4>Manutenção e Upgrade</h4>
+            <p>Instalação de SSD, memória e limpeza física completa de hardware.</p>
+          </div>
+          <div class="servico-item">
+            <h4>Formatação e Sistemas</h4>
+            <p>Instalação limpa de sistemas operativos modernos, softwares livres e drivers.</p>
+          </div>
+          <div class="servico-item">
+            <h4>Diagnóstico Técnico</h4>
+            <p>Análise de falhas, problemas de placa-mãe, e computadores que não ligam.</p>
+          </div>
+          <div class="servico-item">
+            <h4>Suporte Informático Geral</h4>
+            <p>Atendimento a dúvidas, conserto de redes e otimização básica.</p>
+          </div>
+        </div>
+
+        <a href="assistencia.php" class="btn-servicos">
+          Ver Preços Sociais &amp; Agendar
+          <span class="arrow">⟶</span>
+        </a>
+      </div>
+
+      <!-- RIGHT — isometric device SVG -->
+      <div class="servicos-right">
+        <svg viewBox="0 0 380 420" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <defs>
+            <linearGradient id="dTop"   x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#7dffad"/>
+              <stop offset="100%" stop-color="#35d46a"/>
+            </linearGradient>
+            <linearGradient id="dFront" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#2ebd5e"/>
+              <stop offset="100%" stop-color="#1a8a40"/>
+            </linearGradient>
+            <linearGradient id="dSide"  x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#1a8a40"/>
+              <stop offset="100%" stop-color="#0f5a28"/>
+            </linearGradient>
+          </defs>
+
+          <!-- device body top face -->
+          <polygon points="105,80 245,16 330,62 190,126" fill="url(#dTop)"/>
+
+          <!-- front face -->
+          <polygon points="105,80 190,126 190,370 105,324" fill="url(#dFront)"/>
+
+          <!-- side face (right) -->
+          <polygon points="190,126 330,62 330,306 190,370" fill="url(#dSide)"/>
+
+          <!-- top face detail lines -->
+          <line x1="122" y1="94"  x2="245" y2="30"  stroke="#7dffad" stroke-width="1" opacity="0.18"/>
+          <line x1="138" y1="103" x2="261" y2="39"  stroke="#7dffad" stroke-width="1" opacity="0.18"/>
+          <line x1="155" y1="112" x2="278" y2="48"  stroke="#7dffad" stroke-width="1" opacity="0.15"/>
+          <line x1="172" y1="120" x2="295" y2="56"  stroke="#7dffad" stroke-width="1" opacity="0.12"/>
+
+          <!-- front face: grid mesh -->
+          <!-- vertical lines -->
+          <line x1="120" y1="148" x2="120" y2="348" stroke="#35d46a" stroke-width="1" opacity="0.22"/>
+          <line x1="133" y1="150" x2="133" y2="352" stroke="#35d46a" stroke-width="1" opacity="0.22"/>
+          <line x1="146" y1="152" x2="146" y2="354" stroke="#35d46a" stroke-width="1" opacity="0.22"/>
+          <line x1="159" y1="154" x2="159" y2="356" stroke="#35d46a" stroke-width="1" opacity="0.22"/>
+          <line x1="172" y1="156" x2="172" y2="358" stroke="#35d46a" stroke-width="1" opacity="0.22"/>
+          <line x1="185" y1="158" x2="185" y2="360" stroke="#35d46a" stroke-width="1" opacity="0.18"/>
+          <!-- horizontal lines -->
+          <line x1="108" y1="162" x2="188" y2="166" stroke="#35d46a" stroke-width="1" opacity="0.22"/>
+          <line x1="108" y1="178" x2="188" y2="182" stroke="#35d46a" stroke-width="1" opacity="0.22"/>
+          <line x1="108" y1="194" x2="188" y2="198" stroke="#35d46a" stroke-width="1" opacity="0.22"/>
+          <line x1="108" y1="210" x2="188" y2="214" stroke="#35d46a" stroke-width="1" opacity="0.22"/>
+          <line x1="108" y1="226" x2="188" y2="230" stroke="#35d46a" stroke-width="1" opacity="0.22"/>
+          <line x1="108" y1="242" x2="188" y2="246" stroke="#35d46a" stroke-width="1" opacity="0.22"/>
+          <line x1="108" y1="258" x2="188" y2="262" stroke="#35d46a" stroke-width="1" opacity="0.22"/>
+          <line x1="108" y1="274" x2="188" y2="278" stroke="#35d46a" stroke-width="1" opacity="0.22"/>
+          <line x1="108" y1="290" x2="188" y2="294" stroke="#35d46a" stroke-width="1" opacity="0.22"/>
+          <line x1="108" y1="306" x2="188" y2="310" stroke="#35d46a" stroke-width="1" opacity="0.22"/>
+          <line x1="108" y1="322" x2="188" y2="326" stroke="#35d46a" stroke-width="1" opacity="0.18"/>
+          <line x1="108" y1="338" x2="188" y2="342" stroke="#35d46a" stroke-width="1" opacity="0.15"/>
+
+          <!-- LEDs column on left of front face -->
+          <circle cx="112" cy="148" r="5"   fill="#7dffad" opacity="0.95"/>
+          <circle cx="112" cy="148" r="3"   fill="#35d46a"/>
+          <circle cx="112" cy="148" r="7"   fill="none" stroke="#7dffad" stroke-width="1" opacity="0.4"/>
+          <circle cx="112" cy="168" r="4"   fill="#1fa34a" opacity="0.8"/>
+          <circle cx="112" cy="168" r="2.5" fill="#0f5a28"/>
+          <circle cx="112" cy="185" r="4"   fill="#1fa34a" opacity="0.7"/>
+          <circle cx="112" cy="185" r="2.5" fill="#0f5a28"/>
+
+          <!-- side face: grid mesh -->
+          <line x1="205" y1="140" x2="318" y2="82"  stroke="#1fa34a" stroke-width="1" opacity="0.25"/>
+          <line x1="205" y1="156" x2="318" y2="98"  stroke="#1fa34a" stroke-width="1" opacity="0.25"/>
+          <line x1="205" y1="172" x2="318" y2="114" stroke="#1fa34a" stroke-width="1" opacity="0.25"/>
+          <line x1="205" y1="188" x2="318" y2="130" stroke="#1fa34a" stroke-width="1" opacity="0.22"/>
+          <line x1="205" y1="204" x2="318" y2="146" stroke="#1fa34a" stroke-width="1" opacity="0.22"/>
+          <line x1="205" y1="220" x2="318" y2="162" stroke="#1fa34a" stroke-width="1" opacity="0.22"/>
+          <line x1="205" y1="236" x2="318" y2="178" stroke="#1fa34a" stroke-width="1" opacity="0.20"/>
+          <line x1="205" y1="252" x2="318" y2="194" stroke="#1fa34a" stroke-width="1" opacity="0.20"/>
+          <line x1="205" y1="268" x2="318" y2="210" stroke="#1fa34a" stroke-width="1" opacity="0.18"/>
+          <line x1="205" y1="284" x2="318" y2="226" stroke="#1fa34a" stroke-width="1" opacity="0.18"/>
+          <line x1="205" y1="300" x2="318" y2="242" stroke="#1fa34a" stroke-width="1" opacity="0.15"/>
+
+          <!-- vertical lines on side -->
+          <line x1="218" y1="130" x2="218" y2="364" stroke="#1fa34a" stroke-width="1" opacity="0.2"/>
+          <line x1="240" y1="119" x2="240" y2="352" stroke="#1fa34a" stroke-width="1" opacity="0.2"/>
+          <line x1="262" y1="108" x2="262" y2="341" stroke="#1fa34a" stroke-width="1" opacity="0.2"/>
+          <line x1="284" y1="97"  x2="284" y2="330" stroke="#1fa34a" stroke-width="1" opacity="0.18"/>
+          <line x1="306" y1="86"  x2="306" y2="319" stroke="#1fa34a" stroke-width="1" opacity="0.15"/>
+
+          <!-- glow shadow -->
+          <ellipse cx="215" cy="388" rx="130" ry="14" fill="#35d46a" opacity="0.07"/>
+        </svg>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <div class="footer-wrapper">
+
+    <!-- decor: folhas -->
+    <div class="leaf-deco" style="top:-2px; left:0; width:100%; height:42px; opacity:0.5;">
+      <svg viewBox="0 0 600 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <path d="M0 40 C100 10 150 70 250 40 C350 10 400 70 500 40 C550 25 580 35 600 40" stroke="#1a8a40" stroke-width="2.5" fill="none" opacity="0.4"/>
+        <ellipse cx="60" cy="22" rx="16" ry="7" fill="#35d46a" opacity="0.32" transform="rotate(-20 60 22)"/>
+        <ellipse cx="180" cy="55" rx="16" ry="7" fill="#35d46a" opacity="0.32" transform="rotate(20 180 55)"/>
+        <ellipse cx="300" cy="22" rx="16" ry="7" fill="#7dffad" opacity="0.3" transform="rotate(-20 300 22)"/>
+        <ellipse cx="420" cy="55" rx="16" ry="7" fill="#7dffad" opacity="0.3" transform="rotate(20 420 55)"/>
+        <ellipse cx="540" cy="28" rx="14" ry="6" fill="#35d46a" opacity="0.28" transform="rotate(-15 540 28)"/>
+      </svg>
+    </div>
+    <div class="leaf-deco hide-mobile" style="bottom:-30px; left:-30px; width:140px; height:168px; opacity:0.3; transform:rotate(-10deg);">
+      <svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
+        <path d="M60 150 C20 120 10 70 35 20 C45 5 60 5 70 20 C100 65 100 120 60 150 Z" fill="#1fa34a" opacity="0.5"/>
+      </svg>
+    </div>
+    <footer>
+
+      <!-- BRAND -->
+      <div class="footer-brand">
+        <div class="logo-box">
+          <a href="home.html" style="text-decoration:none;">
+            <img src="imagem/logo-pi.png" alt="Logo Ecoobytes" class="logo-img">
+            <div class="logo-text">
+              <div class="logo-name">
+                <span class="ecoo">ECOO</span><span class="byte">BYTES</span>
+              </div>
+              <span class="logo-coop">COOPERATIVA</span>
+            </div>
+          </a>
+        </div>
+        <p class="footer-desc">
+          Associação sem fins lucrativos que recupera lixo tecnológico, transforma
+          em ferramentas de inclusão social e oferece assistência técnica de impacto.
+        </p>
+      </div>
+
+      <!-- EXPLORAR -->
+      <div class="footer-col">
+        <h5>Explorar</h5>
+        <ul>
+          <li><a href="index.html">Página Principal</a></li>
+          <li><a href="doacao.php">Doar Computador</a></li>
+          <li><a href="#servicos">Serviços Técnicos</a></li>
+        </ul>
+      </div>
+
+      <!-- CONTATO -->
+      <div class="footer-col">
+        <h5>Contato &amp; Endereço</h5>
+        <ul>
+          <li><a href="mailto:ecoobytesbr@gmail.com">ecoobytesbr@gmail.com</a></li>
+          <li><a href="https://www.ecoobytes.com" target="_blank">www.ecoobytes.com</a></li>
+          <li><a href="#">@ecoobytes.tech</a></li>
+        </ul>
+      </div>
+
+    </footer>
+
+    <div class="footer-bottom">
+      © 2026 Cooperativa Ecoobytes. Todos os direitos reservados.
+    </div>
+  </div>
+
+</body>
+</html>
