@@ -117,7 +117,7 @@ Armazena os agendamentos de doação enviados pelo formulário de `doacao.php`.
 
 ## Como Executar o Projeto
 
-1. **Instale** um ambiente PHP + MySQL local (ex.: XAMPP, WAMP, MAMP, ou PHP embutido + MySQL Server separado).
+1. **Instale** um ambiente PHP + MySQL local (ex.: XAMPP, WAMP, MAMP, Docker ou PHP embutido + MySQL Server separado).
 2. **Crie o banco de dados** executando o script SQL disponibilizado (criação de `sistema`/`ecoobytes` e das tabelas `chamados` e `doacoes`).
 3. **Ajuste as credenciais de conexão** nos arquivos `assistencia.php` e `doacao.php`:
    ```php
