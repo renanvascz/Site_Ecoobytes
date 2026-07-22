@@ -1,3 +1,5 @@
+//PHP - BACK END
+
 <?php
 // ============================================================
 // PROCESSAMENTO DO FORMULÁRIO (só executa quando o método é POST,
@@ -65,6 +67,8 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
     $tipoMsg  = 'sucesso';
 }
 ?>
+
+//FRONT-END
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -442,8 +446,7 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
     @media (max-width: 600px) {
       nav { min-height: 68px; height: auto; }
       .logo-img { width: 46px; height: 46px; }
-      .logo-name { font-size: 20px; }
-      .logo-coop { font-size: 10px; letter-spacing: 1.5px; }
+      .logo-text { display: none; }      
       .btn-nav { padding: 9px 18px; font-size: 13.5px; }
       .nav-toggle { width: 36px; height: 36px; }
     }

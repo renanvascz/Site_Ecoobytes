@@ -1,11 +1,11 @@
+//PHP BACK END
+
 <?php
 // ============================================================
 // PROCESSAMENTO DO FORMULÁRIO (só executa quando o método é POST)
 // ============================================================
-
 $mensagem = '';
 $tipoMsg  = ''; // 'sucesso' ou 'erro'
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $conn = new mysqli(
     'localhost', // servidor
@@ -13,30 +13,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     '1234',      // senha
     'ecoobytes'  // banco de dados
     );
-
     if ($conn->connect_error) {
         $mensagem = 'Não foi possível conectar ao banco de dados. Tente novamente mais tarde.';
         $tipoMsg  = 'erro';
     } else {
-
         // Pega os dados do formulário com segurança (evita "Undefined array key")
         $nome        = trim($_POST['nome'] ?? '');
         $whatsapp    = trim($_POST['whatsapp'] ?? '');
         $equipamento = trim($_POST['equipamento'] ?? '');
         $problema    = trim($_POST['problema'] ?? '');
-
         // Validação no servidor (a do JavaScript é só para conforto do usuário)
         if ($nome === '' || $whatsapp === '' || $problema === '') {
             $mensagem = 'Por favor, preencha todos os campos obrigatórios.';
             $tipoMsg  = 'erro';
         } else {
-
             // Prepared statement: evita injeção de SQL
             $stmt = $conn->prepare(
                 'INSERT INTO chamados (nome, whatsapp, equipamento, problema) VALUES (?, ?, ?, ?)'
             );
             $stmt->bind_param('ssss', $nome, $whatsapp, $equipamento, $problema);
-
             if ($stmt->execute()) {
                 $stmt->close();
                 $conn->close();
@@ -52,13 +47,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $conn->close();
     }
 }
-
 // Mensagem de sucesso após o redirecionamento
 if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
     $mensagem = 'Chamado enviado com sucesso! Nossa equipe entrará em contato em breve.';
     $tipoMsg  = 'sucesso';
 }
 ?>
+
+//FRONT END
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -66,9 +63,10 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>EcooBytes — Assistência Técnica</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  
+  //CSS
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
       --bg:       #090d1a;
       --bg-nav:   #0b0f1e;
@@ -81,14 +79,12 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       --white:    #ffffff;
       --muted:    #b0bac8;
     }
-
     html, body {
       background: var(--bg);
       color: var(--white);
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
     }
-
     /* ── NAV ── */
     header { background: var(--bg-nav); position: sticky; top: 0; z-index: 100; }
     nav {
@@ -100,7 +96,6 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       background: linear-gradient(90deg, transparent, var(--green), transparent);
       opacity: 0.55;
     }
-
     .logo-box { display: flex; align-items: center; }
     .logo-box a { display: flex; align-items: center; gap: 12px; text-decoration: none; }
     .logo-img { width: 55px; height: 55px; object-fit: contain; }
@@ -117,20 +112,16 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       font-size: 12px; font-weight: 500; letter-spacing: 2px; margin-top: 2px;
       width: 100%; text-align: center;
     }
-
     .nav-links { flex: 1; display: flex; justify-content: center; gap: 36px; list-style: none; }
     .nav-links a { color: var(--white); text-decoration: none; font-size: 15px; font-weight: 500; opacity: .88; transition: opacity .2s, color .2s; }
     .nav-links a:hover { opacity: 1; color: var(--green); }
-
     .nav-actions { display: flex; align-items: center; gap: 14px; }
-
     .btn-nav {
       background: var(--green); color: #0a0e1a; font-size: 15px; font-weight: 700;
       padding: 11px 28px; border-radius: 8px; border: none; cursor: pointer;
       text-decoration: none; transition: filter .2s, transform .15s; white-space: nowrap;
     }
     .btn-nav:hover { filter: brightness(1.1); transform: translateY(-1px); }
-
     /* hamburger toggle (mobile only) */
     .nav-toggle {
       display: none;
@@ -157,14 +148,12 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
     .nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
     .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
     /* ── PAGE ── */
     .page-wrap {
       max-width: 1180px;
       margin: 0 auto;
       padding: 70px 40px 100px;
     }
-
     /* ── ALERT (mensagem de sucesso/erro do PHP) ── */
     .alert {
       max-width: 1180px;
@@ -185,7 +174,6 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       border: 1.5px solid rgba(255,90,90,0.4);
       color: #ff9a9a;
     }
-
     /* ── GRID ── */
     .assist-grid {
       display: grid;
@@ -193,7 +181,6 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       gap: 28px;
       align-items: start;
     }
-
     /* ── LEFT CARD: price table ── */
     .price-card {
       background: var(--bg-card);
@@ -201,7 +188,6 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       border-radius: 20px;
       padding: 32px 28px 28px;
     }
-
     .price-card-title {
       font-size: 16px;
       font-weight: 800;
@@ -209,9 +195,7 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
       margin-bottom: 28px;
     }
-
     .price-list { display: flex; flex-direction: column; }
-
     .price-item {
       display: flex;
       justify-content: space-between;
@@ -221,11 +205,9 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       gap: 12px;
     }
     .price-item:last-child { border-bottom: none; }
-
     .price-item-info { display: flex; flex-direction: column; gap: 4px; }
     .price-item-name { font-size: 14px; font-weight: 700; color: var(--white); }
     .price-item-sub  { font-size: 12px; color: var(--muted); opacity: .75; }
-
     .price-badge {
       font-size: 12px;
       font-weight: 700;
@@ -233,7 +215,6 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       background: linear-gradient(135deg, var(--green-lt) 0%, var(--green) 60%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-
     /* info box */
     .info-box {
       background: var(--bg-inner);
@@ -254,7 +235,6 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       line-height: 1.65;
       opacity: .85;
     }
-
     /* ── RIGHT CARD: form ── */
     .form-card {
       background: var(--bg-card);
@@ -262,14 +242,12 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       border-radius: 20px;
       padding: 36px 36px 40px;
     }
-
     .form-card h2 {
       font-size: 26px;
       font-weight: 800;
       letter-spacing: -0.3px;
       margin-bottom: 32px;
     }
-
     /* field groups */
     .field-group {
       display: flex;
@@ -277,7 +255,6 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       gap: 6px;
       margin-bottom: 22px;
     }
-
     .field-group label {
       font-size: 11px;
       font-weight: 700;
@@ -285,7 +262,6 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       text-transform: uppercase;
       color: var(--muted);
     }
-
     .field-group input,
     .field-group textarea {
       background: var(--bg-inner);
@@ -307,13 +283,11 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       box-shadow: 0 0 0 3px rgba(53,212,106,0.07);
     }
     .field-group textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
-
     .form-row-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 20px;
     }
-
     /* submit */
     .btn-submit {
       width: 100%;
@@ -332,13 +306,11 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
     }
     .btn-submit:hover { filter: brightness(1.1); transform: translateY(-2px); }
     .btn-submit:disabled { opacity: .7; cursor: not-allowed; transform: none; }
-
     .divider {
       border: none;
       border-top: 1px solid rgba(255,255,255,0.07);
       margin-bottom: 22px;
     }
-
     .whatsapp-hint {
       text-align: center;
       font-size: 13.5px;
@@ -346,7 +318,6 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       margin-bottom: 14px;
       opacity: .8;
     }
-
     .btn-whatsapp {
       display: flex;
       align-items: center;
@@ -376,7 +347,6 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       transition: background .2s;
     }
     .btn-whatsapp:hover .wa-dot { background: #0a0e1a; }
-
     /* ── FOOTER ── */
     .footer-wrapper { border-top: 1px solid rgba(255,255,255,0.07); background: #0b0f1e; }
     footer {
@@ -400,13 +370,10 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
     .footer-col ul li a { font-size: 14px; color: var(--muted); text-decoration: none; opacity: .8; transition: color .2s, opacity .2s; }
     .footer-col ul li a:hover { color: var(--white); opacity: 1; }
     .footer-bottom { border-top: 1px solid rgba(255,255,255,.06); text-align: center; padding: 22px 40px; font-size: 13px; color: var(--muted); opacity: .6; }
-
     @media (max-width: 900px) {
       .assist-grid { grid-template-columns: 1fr; }
       .page-wrap { padding: 48px 20px 70px; }
-
       .nav-toggle { display: flex; }
-
       .nav-links {
         position: absolute;
         top: 100%;
@@ -447,20 +414,18 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
     @media (max-width: 600px) {
       nav { min-height: 68px; height: auto; }
       .logo-img { width: 46px; height: 46px; }
-      .logo-name { font-size: 20px; }
-      .logo-coop { font-size: 10px; letter-spacing: 1.5px; }
+      .logo-text { display: none; }
       .btn-nav { padding: 9px 18px; font-size: 13.5px; }
       .nav-toggle { width: 36px; height: 36px; }
     }
     @media (max-width: 380px) {
-      .logo-name { font-size: 17px; }
-      .logo-coop { display: none; }
       .btn-nav { padding: 8px 14px; font-size: 12.5px; }
     }
   </style>
+  
+  //HTML
 </head>
 <body>
-
   <!-- ── HEADER ── -->
   <header>
     <nav>
@@ -475,7 +440,6 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
           </div>
         </a>
       </div>
-
       <ul class="nav-links" id="navLinksList">
         <li><a href="index.html">Inicio</a></li>
         <li><a href="index.html#sobre-nos">Sobre Nós</a></li>
@@ -483,7 +447,6 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
         <li><a href="index.html#nosso-impacto">Nosso Impacto</a></li>
         <li><a href="index.html#servicos">Serviços Técnicos</a></li>
       </ul>
-
       <div class="nav-actions">
         <a href="doacao.php" class="btn-nav">Doar Agora</a>
         <button type="button" class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="navLinksList">
@@ -493,24 +456,20 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
     </nav>
     <div class="nav-line"></div>
   </header>
-
   <script>
     (function () {
       const navToggle = document.getElementById('navToggle');
       const navLinks  = document.getElementById('navLinksList');
-
       navToggle.addEventListener('click', () => {
         const isOpen = navLinks.classList.toggle('is-open');
         navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
       });
-
       navLinks.querySelectorAll('a').forEach((link) => {
         link.addEventListener('click', () => {
           navLinks.classList.remove('is-open');
           navToggle.setAttribute('aria-expanded', 'false');
         });
       });
-
       window.addEventListener('resize', () => {
         if (window.innerWidth > 900) {
           navLinks.classList.remove('is-open');
@@ -519,23 +478,18 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       });
     })();
   </script>
-
   <!-- ── MAIN ── -->
   <main>
     <div class="page-wrap">
-
       <?php if ($mensagem): ?>
         <div class="alert alert-<?php echo $tipoMsg === 'sucesso' ? 'sucesso' : 'erro'; ?>">
           <?php echo htmlspecialchars($mensagem); ?>
         </div>
       <?php endif; ?>
-
       <div class="assist-grid">
-
         <!-- ── LEFT: PRICE TABLE ── -->
         <div class="price-card">
           <p class="price-card-title">Tabela de Preços Sociais</p>
-
           <div class="price-list">
             <div class="price-item">
               <div class="price-item-info">
@@ -566,25 +520,20 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
               <span class="price-badge">Preço Social</span>
             </div>
           </div>
-
           <div class="info-box">
             <p class="info-title">Como funciona?</p>
             <p>O valor cobrado é integralmente revertido para a capacitação dos cooperados e para os insumos operacionais necessários aos testes técnicos de caridade.</p>
           </div>
         </div>
-
         <!-- ── RIGHT: FORM ── -->
         <div class="form-card">
           <h2>Solicitar Orçamento / Assistência</h2>
-
           <form id="assistForm" method="POST" action="assistencia.php" onsubmit="return validarFormulario(event)" novalidate>
-
             <div class="field-group">
               <label for="nome">O seu nome</label>
               <input type="text" id="nome" name="nome" placeholder="Como podemos lhe chamar?" required
                      value="<?php echo htmlspecialchars($_POST['nome'] ?? ''); ?>"/>
             </div>
-
             <div class="form-row-2">
               <div class="field-group">
                 <label for="whatsapp">WhatsApp para contato</label>
@@ -597,32 +546,24 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
                        value="<?php echo htmlspecialchars($_POST['equipamento'] ?? ''); ?>"/>
               </div>
             </div>
-
             <div class="field-group">
               <label for="problema">Descreva o problema</label>
               <textarea id="problema" name="problema" placeholder="Diga-nos o que está acontecendo (ex: Liga mas não dá imagem, fica muito lento na formatação...)" required><?php echo htmlspecialchars($_POST['problema'] ?? ''); ?></textarea>
             </div>
-
             <button type="submit" class="btn-submit" id="submitBtn">
               Enviar Chamado para Análise
             </button>
-
             <hr class="divider"/>
-
             <p class="whatsapp-hint">Prefere contato direto em tempo real?</p>
-
             <a href="https://wa.me/5500000000000" target="_blank" class="btn-whatsapp">
               <span class="wa-dot"></span>
               Chame diretamente no Whatsapp
             </a>
-
           </form>
         </div>
-
       </div>
     </div>
   </main>
-
   <!-- ── FOOTER ── -->
   <div class="footer-wrapper">
     <footer>
@@ -655,7 +596,7 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
         <h5>Contato &amp; Endereço</h5>
         <ul>
           <li><a href="mailto:ecoobytesbr@gmail.com">ecoobytesbr@gmail.com</a></li>
-          <li><a href="https://www.ecoobytes.com" target="_blank">www.ecoobytes.com</a></li>
+          <li><a href="https://www.ecoobytes.com" target="_blank">[www.ecoobytes.com](https://www.ecoobytes.com)</a></li>
           <li><a href="#">@ecoobytes.tech</a></li>
         </ul>
       </div>
@@ -664,7 +605,6 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       © 2026 Cooperativa Ecoobytes. Todos os direitos reservados.
     </div>
   </div>
-
   <script>
     /* phone mask */
     document.getElementById('whatsapp').addEventListener('input', function(e) {
@@ -674,28 +614,23 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
       else if (v.length > 0) v = `(${v}`;
       e.target.value = v;
     });
-
     /* ── VALIDAÇÃO NO CLIENTE (apenas melhora a experiência;
        a validação que realmente protege o banco é a do PHP) ── */
     function validarFormulario(e) {
       const nome     = document.getElementById('nome').value.trim();
       const whatsapp = document.getElementById('whatsapp').value.trim();
       const problema = document.getElementById('problema').value.trim();
-
       if (!nome || !whatsapp || !problema) {
         e.preventDefault();
         alert('Por favor, preencha os campos obrigatórios.');
         return false;
       }
-
       const btn = document.getElementById('submitBtn');
       btn.textContent = 'Enviando...';
       btn.disabled = true;
-
       // Passou na validação: deixa o form seguir o envio normal (POST para o PHP)
       return true;
     }
   </script>
-
 </body>
 </html>
