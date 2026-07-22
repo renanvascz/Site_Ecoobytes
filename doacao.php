@@ -1,4 +1,3 @@
-//PHP - BACK END
 
 <?php
 // ============================================================
@@ -68,7 +67,6 @@ if (isset($_GET['status']) && $_GET['status'] === 'sucesso') {
 }
 ?>
 
-//FRONT-END
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
